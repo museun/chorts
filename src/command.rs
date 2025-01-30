@@ -54,36 +54,99 @@ impl Tool {
     }
 }
 
+// FIXME this should allow multiple
 #[derive(Debug, Clone, Default)]
-#[non_exhaustive]
 pub enum Target {
     #[default]
-    Default,
-    All,
-    Test,
-    Example,
-    Specific(Vec<String>),
+    Lib,
+    Bins,
+    Bin(String),
+    Examples,
+    Example(String),
+    Tests,
+    Test(String),
+    Benches,
+    Bench(String),
+    AllTargets,
 }
 
+#[cfg(feature = "clap")]
 impl Target {
-    pub fn specific<T: ToString>(targets: impl IntoIterator<Item = T>) -> Self {
-        Self::Specific(targets.into_iter().map(|s| s.to_string()).collect())
+    pub const LIB: &str = "lib";
+    pub const BINS: &str = "bins";
+    pub const EXAMPLES: &str = "examples";
+    pub const TESTS: &str = "tests";
+    pub const BENCHES: &str = "benches";
+    pub const ALL_TARGETS: &str = "all_targets";
+
+    pub const BIN: &str = "bin";
+    pub const EXAMPLE: &str = "example";
+    pub const TEST: &str = "test";
+    pub const BENCH: &str = "bench";
+
+    pub fn parse(matches: &mut clap::ArgMatches) -> Self {
+        for (k, v) in [
+            (Self::LIB, Self::Lib),
+            (Self::BINS, Self::Bins),
+            (Self::EXAMPLES, Self::Examples),
+            (Self::TESTS, Self::Tests),
+            (Self::BENCHES, Self::Benches),
+            (Self::ALL_TARGETS, Self::AllTargets),
+        ] {
+            if matches.get_flag(k) {
+                return v;
+            }
+        }
+
+        for (k, v) in [
+            (Self::BIN, Self::Bin as fn(String) -> Self),
+            (Self::EXAMPLE, Self::Example),
+            (Self::TEST, Self::Test),
+            (Self::BENCH, Self::Bench),
+        ] {
+            if let Some(value) = matches.remove_one(k) {
+                return v(value);
+            }
+        }
+
+        Self::Lib
     }
 }
 
 #[derive(Debug, Clone, Default)]
-#[non_exhaustive]
 pub enum Features {
-    #[default]
-    Default,
     All,
     None,
+    #[default]
+    Default,
     Specific(Vec<String>),
 }
 
+#[cfg(feature = "clap")]
 impl Features {
-    pub fn specific<T: ToString>(features: impl IntoIterator<Item = T>) -> Self {
-        Self::Specific(features.into_iter().map(|s| s.to_string()).collect())
+    pub const ALL_FEATURES: &str = "all_features";
+    pub const NO_FEATURES: &str = "no_features";
+    pub const FEATURES: &str = "features";
+
+    pub fn parse(matches: &mut clap::ArgMatches) -> Self {
+        if matches.get_flag(Self::ALL_FEATURES) {
+            return Self::All;
+        }
+        if matches.get_flag(Self::NO_FEATURES) {
+            return Self::None;
+        }
+
+        if let Some(features) = matches.remove_many::<String>(Self::FEATURES) {
+            let mut out = vec![];
+            for feature in features {
+                out.extend(feature.split_terminator(',').map(|t| t.to_owned()))
+            }
+            out.sort_unstable();
+            out.dedup();
+            return Self::Specific(out);
+        }
+
+        Self::Default
     }
 }
 
@@ -182,22 +245,38 @@ impl Command {
             cmd.arg(path);
         }
 
+        // TODO this should be a Vec<Target>
         match &self.target {
-            Target::All => {
-                cmd.arg("--all-targets");
+            Target::Lib => {
+                cmd.arg("--lib");
             }
-            Target::Test => {
-                cmd.arg("--tests");
+            Target::Bins => {
+                cmd.arg("--bins");
             }
-            Target::Example => {
+            Target::Bin(bin) => {
+                cmd.arg("--bin").arg(bin);
+            }
+            Target::Examples => {
                 cmd.arg("--examples");
             }
-            Target::Specific(targets) => {
-                for target in targets {
-                    cmd.arg("--target").arg(target);
-                }
+            Target::Example(example) => {
+                cmd.arg("--example").arg(example);
             }
-            Target::Default => {}
+            Target::Tests => {
+                cmd.arg("--tests");
+            }
+            Target::Test(test) => {
+                cmd.arg("--test").arg(test);
+            }
+            Target::Benches => {
+                cmd.arg("--benches");
+            }
+            Target::Bench(bench) => {
+                cmd.arg("--bench").arg(bench);
+            }
+            Target::AllTargets => {
+                cmd.arg("--all-targets");
+            }
         }
 
         match &self.features {
@@ -207,11 +286,13 @@ impl Command {
             Features::None => {
                 cmd.arg("--no-default-features");
             }
-            Features::Specific(features) => {
-                for feature in features {
+
+            Features::Specific(list) => {
+                for feature in list {
                     cmd.arg("--features").arg(feature);
                 }
             }
+
             Features::Default => {}
         }
 
