@@ -1,6 +1,6 @@
 use std::{
     ffi::{OsStr, OsString},
-    io::Read,
+    io::{BufReader, Read},
     path::{Path, PathBuf},
     process::Stdio,
 };
@@ -310,9 +310,12 @@ impl Command {
     }
 
     pub fn run(&self) -> anyhow::Result<impl Read> {
-        let child = self.build().spawn()?;
-        let stdout = child.stdout.expect("stdout attached to child process");
-        Ok(stdout)
+        Ok(BufReader::new(
+            self.build()
+                .spawn()?
+                .stdout
+                .expect("stdout attached to child process"),
+        ))
     }
 }
 
