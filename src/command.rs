@@ -18,6 +18,18 @@ impl Flag {
             value: value.into(),
         }
     }
+
+    pub fn warning(value: impl Into<OsString>) -> Self {
+        Self::new("-W", value)
+    }
+
+    pub fn allow(value: impl Into<OsString>) -> Self {
+        Self::new("-A", value)
+    }
+
+    pub fn deny(value: impl Into<OsString>) -> Self {
+        Self::new("-D", value)
+    }
 }
 
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
