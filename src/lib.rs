@@ -4,7 +4,7 @@ use std::{
 };
 
 mod visit;
-pub use visit::{Visit, Visitor};
+pub use visit::{Filename, Highlight, Visit, Visitor};
 
 pub fn locate_manifest(path: impl AsRef<Path>) -> anyhow::Result<PathBuf> {
     let path = path.as_ref();
