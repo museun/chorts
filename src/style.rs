@@ -1,6 +1,6 @@
 use crate::Error;
 
-#[derive(Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Style {
     #[serde(default)]
     pub color: Option<Color>,
