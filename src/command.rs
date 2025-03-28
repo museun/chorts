@@ -5,6 +5,8 @@ use std::{
     process::Stdio,
 };
 
+use crate::Error;
+
 #[derive(Clone, Debug)]
 pub struct Flag {
     key: OsString,
@@ -199,13 +201,11 @@ impl Command {
         self
     }
 
-    pub fn with_manifest_path(mut self, path: impl AsRef<Path>) -> anyhow::Result<Self> {
+    pub fn with_manifest_path(mut self, path: impl AsRef<Path>) -> Result<Self, Error> {
         let path = path.as_ref();
-        anyhow::ensure!(
-            Self::is_valid_manifest_path(path),
-            "Invalid path to Cargo.toml: {}",
-            path.display()
-        );
+        if !Self::is_valid_manifest_path(path) {
+            return Err(Error::InvalidPath(path.to_path_buf()));
+        }
         self.path = Some(path.to_path_buf());
         Ok(self)
     }
@@ -232,7 +232,7 @@ impl Command {
 }
 
 impl Command {
-    pub fn gather(&self) -> anyhow::Result<Vec<crate::data::Reason>> {
+    pub fn gather(&self) -> Result<Vec<crate::data::Reason>, Error> {
         self.run().map(|json| {
             serde_json::Deserializer::from_reader(json)
                 .into_iter()
@@ -321,7 +321,7 @@ impl Command {
         cmd
     }
 
-    pub fn run(&self) -> anyhow::Result<impl Read> {
+    pub fn run(&self) -> Result<impl Read, Error> {
         Ok(BufReader::new(
             self.build()
                 .spawn()?
