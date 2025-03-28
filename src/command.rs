@@ -100,6 +100,20 @@ impl Tool {
     }
 }
 
+#[cfg(feature = "clap")]
+impl ::clap::ValueEnum for Tool {
+    fn value_variants<'a>() -> &'a [Self] {
+        &[Self::Clippy, Self::Check]
+    }
+
+    fn to_possible_value(&self) -> Option<::clap::builder::PossibleValue> {
+        Some(match self {
+            Self::Clippy => ::clap::builder::PossibleValue::new(self.as_str()),
+            Self::Check => ::clap::builder::PossibleValue::new(self.as_str()),
+        })
+    }
+}
+
 // FIXME this should allow multiple
 #[derive(Debug, Clone, Default)]
 pub enum Target {
