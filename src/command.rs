@@ -36,6 +36,7 @@ impl Flag {
 
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[non_exhaustive]
+#[serde(rename_all = "snake_case")]
 pub enum Toolchain {
     #[default]
     Stable,
@@ -69,6 +70,7 @@ impl Toolchain {
 
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[non_exhaustive]
+#[serde(rename_all = "snake_case")]
 pub enum Tool {
     #[default]
     Clippy,
