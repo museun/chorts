@@ -218,7 +218,7 @@ pub struct Command {
     tool: Tool,
     path: Option<PathBuf>,
     toolchain: Toolchain,
-    target: Target,
+    target: Option<Target>,
     features: Features,
 }
 
@@ -228,7 +228,7 @@ impl Command {
     }
 
     pub fn with_target(mut self, target: Target) -> Self {
-        self.target = target;
+        self.target = Some(target);
         self
     }
 
@@ -305,36 +305,37 @@ impl Command {
 
         // TODO this should be a Vec<Target>
         match &self.target {
-            Target::Lib => {
+            Some(Target::Lib) => {
                 cmd.arg("--lib");
             }
-            Target::Bins => {
+            Some(Target::Bins) => {
                 cmd.arg("--bins");
             }
-            Target::Bin(bin) => {
+            Some(Target::Bin(bin)) => {
                 cmd.arg("--bin").arg(bin);
             }
-            Target::Examples => {
+            Some(Target::Examples) => {
                 cmd.arg("--examples");
             }
-            Target::Example(example) => {
+            Some(Target::Example(example)) => {
                 cmd.arg("--example").arg(example);
             }
-            Target::Tests => {
+            Some(Target::Tests) => {
                 cmd.arg("--tests");
             }
-            Target::Test(test) => {
+            Some(Target::Test(test)) => {
                 cmd.arg("--test").arg(test);
             }
-            Target::Benches => {
+            Some(Target::Benches) => {
                 cmd.arg("--benches");
             }
-            Target::Bench(bench) => {
+            Some(Target::Bench(bench)) => {
                 cmd.arg("--bench").arg(bench);
             }
-            Target::AllTargets => {
+            Some(Target::AllTargets) => {
                 cmd.arg("--all-targets");
             }
+            _ => {}
         }
 
         match &self.features {
