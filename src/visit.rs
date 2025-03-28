@@ -195,7 +195,7 @@ fn floor_char_boundary(str: &str, index: usize) -> usize {
     let start = index.saturating_sub(3);
     let next = str.as_bytes()[start..=index]
         .iter()
-        .rposition(|&b| (b as u8) >= -0x40)
+        .rposition(|&b| (b as i8) >= -0x40)
         .unwrap();
     start + next
 }
@@ -208,7 +208,7 @@ fn ceil_char_boundary(str: &str, index: usize) -> usize {
     let end = (index + 4).min(str.len());
     str.as_bytes()[index..end]
         .iter()
-        .position(|&b| (b as u8) >= -0x40)
+        .position(|&b| (b as i8) >= -0x40)
         .map_or(end, |pos| pos + index)
 }
 
