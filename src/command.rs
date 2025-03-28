@@ -51,6 +51,22 @@ impl Toolchain {
     }
 }
 
+#[cfg(feature = "clap")]
+impl Toolchain {
+    pub const STABLE: &str = "stable";
+    pub const NIGHTLY: &str = "nightly";
+
+    pub fn parse(matches: &mut clap::ArgMatches) -> Self {
+        for (k, v) in [(Self::STABLE, Self::Stable), (Self::NIGHTLY, Self::Nightly)] {
+            if matches.get_flag(k) {
+                return v;
+            }
+        }
+
+        Self::Stable
+    }
+}
+
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Tool {
@@ -65,6 +81,22 @@ impl Tool {
             Self::Clippy => "clippy",
             Self::Check => "check",
         }
+    }
+}
+
+#[cfg(feature = "clap")]
+impl Tool {
+    pub const CLIPPY: &str = "clippy";
+    pub const CHECK: &str = "check";
+
+    pub fn parse(matches: &mut clap::ArgMatches) -> Self {
+        for (k, v) in [(Self::CLIPPY, Self::Clippy), (Self::CHECK, Self::Check)] {
+            if matches.get_flag(k) {
+                return v;
+            }
+        }
+
+        Self::Clippy
     }
 }
 
