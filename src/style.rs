@@ -192,7 +192,7 @@ impl std::str::FromStr for Color {
 
         for (opts, kind) in TABLE {
             for opt in opts {
-                if input.eq_ignore_ascii_case(*opt) {
+                if input.eq_ignore_ascii_case(opt) {
                     return Ok(kind);
                 }
             }
@@ -215,10 +215,10 @@ impl Color {
             0
         };
 
-        let r = (color >> (12 - offset) & 0xF) as u8;
-        let g = (color >> (12 - offset) & 0xF) as u8;
-        let b = (color >> (12 - offset) & 0xF) as u8;
+        let r = ((color >> (12 - offset)) & 0xF) as u8;
+        let g = ((color >> (12 - offset)) & 0xF) as u8;
+        let b = ((color >> (12 - offset)) & 0xF) as u8;
 
-        Self::Rgb(r << 4 | r, g << 4 | g, b << 4 | b)
+        Self::Rgb((r << 4) | r, (g << 4) | g, (b << 4) | b)
     }
 }
