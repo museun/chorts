@@ -37,7 +37,7 @@ pub mod style;
 
 pub fn locate_manifest(path: impl AsRef<Path>) -> Result<PathBuf, Error> {
     let path = path.as_ref();
-    match path.components().last() {
+    match path.components().next_back() {
         Some(s) if s.as_os_str() == "Cargo.toml" => {}
         Some(..) => {
             if !path.is_dir() {
