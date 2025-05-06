@@ -222,3 +222,110 @@ impl Color {
         Self::Rgb((r << 4) | r, (g << 4) | g, (b << 4) | b)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn color_from_u32() {
+        for (input, expected) in [
+            (0xFF0000, Color::Rgb(0xFF, 0x00, 0x00)),
+            (0x00FF00, Color::Rgb(0x00, 0xFF, 0x00)),
+            (0x0000FF, Color::Rgb(0x00, 0x00, 0xFF)),
+            (0x112233, Color::Rgb(0x11, 0x22, 0x33)),
+            (0x332211, Color::Rgb(0x33, 0x22, 0x11)),
+            (0x00F0F0F, Color::Rgb(0x0F, 0x0F, 0x0F)),
+            (0x0F0F0F0, Color::Rgb(0xF0, 0xF0, 0xF0)),
+        ] {
+            assert_eq!(Color::from_u32(input), expected);
+        }
+    }
+
+    #[test]
+    fn color_from_u16() {
+        for (input, expected) in [
+            (0xF00, Color::Rgb(0xFF, 0x00, 0x00)),
+            (0x0F0, Color::Rgb(0x00, 0xFF, 0x00)),
+            (0x00F, Color::Rgb(0x00, 0x00, 0xFF)),
+            (0x123, Color::Rgb(0x11, 0x22, 0x33)),
+            (0x321, Color::Rgb(0x33, 0x22, 0x11)),
+            (0x0123, Color::Rgb(0x11, 0x22, 0x33)),
+            (0x0321, Color::Rgb(0x33, 0x22, 0x11)),
+        ] {
+            assert_eq!(Color::from_u16(input), expected);
+        }
+    }
+
+    #[test]
+    fn color_from_str() {
+        for (input, output) in [
+            ("#112233", Color::Rgb(0x11, 0x22, 0x33)),
+            ("#123", Color::Rgb(0x11, 0x22, 0x33)),
+            ("#FF0000", Color::Rgb(0xFF, 0x00, 0x00)),
+            ("#F00", Color::Rgb(0xFF, 0x00, 0x00)),
+            ("#0000FF", Color::Rgb(0x00, 0x00, 0xFF)),
+            ("#00F", Color::Rgb(0x00, 0x00, 0xFF)),
+            //
+            ("rgb(10, 20, 30)", Color::Rgb(10, 20, 30)),
+            ("rgb(30, 20, 10)", Color::Rgb(30, 20, 10)),
+            //
+            ("Black", Color::Black),
+            ("Red", Color::Red),
+            ("Green", Color::Green),
+            ("Yellow", Color::Yellow),
+            ("Blue", Color::Blue),
+            ("Magenta", Color::Magenta),
+            ("Cyan", Color::Cyan),
+            ("White", Color::White),
+            ("BrightBlack", Color::BrightBlack),
+            ("BrightRed", Color::BrightRed),
+            ("BrightGreen", Color::BrightGreen),
+            ("BrightYellow", Color::BrightYellow),
+            ("BrightBlue", Color::BrightBlue),
+            ("BrightMagenta", Color::BrightMagenta),
+            ("BrightCyan", Color::BrightCyan),
+            ("BrightWhite", Color::BrightWhite),
+            //
+            ("Bright Black", Color::BrightBlack),
+            ("Bright Red", Color::BrightRed),
+            ("Bright Green", Color::BrightGreen),
+            ("Bright Yellow", Color::BrightYellow),
+            ("Bright Blue", Color::BrightBlue),
+            ("Bright Magenta", Color::BrightMagenta),
+            ("Bright Cyan", Color::BrightCyan),
+            ("Bright White", Color::BrightWhite),
+            //
+            ("black", Color::Black),
+            ("red", Color::Red),
+            ("green", Color::Green),
+            ("yellow", Color::Yellow),
+            ("blue", Color::Blue),
+            ("magenta", Color::Magenta),
+            ("cyan", Color::Cyan),
+            ("white", Color::White),
+            ("brightblack", Color::BrightBlack),
+            ("brightred", Color::BrightRed),
+            ("brightgreen", Color::BrightGreen),
+            ("brightyellow", Color::BrightYellow),
+            ("brightblue", Color::BrightBlue),
+            ("brightmagenta", Color::BrightMagenta),
+            ("brightcyan", Color::BrightCyan),
+            ("brightwhite", Color::BrightWhite),
+            //
+            ("bright black", Color::BrightBlack),
+            ("bright red", Color::BrightRed),
+            ("bright green", Color::BrightGreen),
+            ("bright yellow", Color::BrightYellow),
+            ("bright blue", Color::BrightBlue),
+            ("bright magenta", Color::BrightMagenta),
+            ("bright cyan", Color::BrightCyan),
+            ("bright white", Color::BrightWhite),
+        ] {
+            assert_eq!(
+                input.parse::<Color>().unwrap(),
+                output,
+                "input: {input}, output: {output}"
+            );
+        }
+    }
+}
