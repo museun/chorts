@@ -370,7 +370,7 @@ impl Command {
         cmd
     }
 
-    fn run(&self) -> Result<impl Read, Error> {
+    fn run(&self) -> Result<impl Read + use<>, Error> {
         Ok(BufReader::new(
             self.build()
                 .spawn()?
