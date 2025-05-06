@@ -289,7 +289,7 @@ impl Command {
         })
     }
 
-    pub fn build(&self) -> std::process::Command {
+    fn build(&self) -> std::process::Command {
         let mut cmd = std::process::Command::new("rustup");
         cmd.stdout(Stdio::piped());
         cmd.args([
@@ -370,7 +370,7 @@ impl Command {
         cmd
     }
 
-    pub fn run(&self) -> Result<impl Read, Error> {
+    fn run(&self) -> Result<impl Read, Error> {
         Ok(BufReader::new(
             self.build()
                 .spawn()?
@@ -381,14 +381,15 @@ impl Command {
 }
 
 impl Command {
-    pub fn without_meta(s: String) -> String {
+    // TODO make these less manual to use
+    #[allow(dead_code)]
+    fn without_meta(s: String) -> String {
         s.replace("--message-format=json ", "")
     }
 
-    pub fn command_as_string(
-        cmd: &std::process::Command,
-        filter: impl Fn(String) -> String,
-    ) -> String {
+    // TODO make these less manual to use
+    #[allow(dead_code)]
+    fn command_as_string(cmd: &std::process::Command, filter: impl Fn(String) -> String) -> String {
         let args =
             cmd.get_args()
                 .map(std::ffi::OsStr::to_string_lossy)
