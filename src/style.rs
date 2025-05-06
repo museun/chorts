@@ -216,8 +216,8 @@ impl Color {
         };
 
         let r = ((color >> (12 - offset)) & 0xF) as u8;
-        let g = ((color >> (12 - offset)) & 0xF) as u8;
-        let b = ((color >> (12 - offset)) & 0xF) as u8;
+        let g = ((color >> (8 - offset)) & 0xF) as u8;
+        let b = ((color >> (4 - offset)) & 0xF) as u8;
 
         Self::Rgb((r << 4) | r, (g << 4) | g, (b << 4) | b)
     }
